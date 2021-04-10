@@ -1,5 +1,6 @@
 #include <Servo.h>
 
+// defined arduino pins
 #define Srv_1 3
 #define Srv_2 5
 #define Srv_3 6
@@ -12,26 +13,56 @@ Servo Srv_Arm1;
 Servo Srv_Arm2;
 Servo Srv_Grip;
 
+// initial positions for all servomechanisms
 int Srv_Pos_BaseLow = 90;
 int Srv_Pos_BaseAbove = 130;
 int Srv_Pos_Arm1 = 100;
 int Srv_Pos_Arm2 = 90;
 int Srv_Pos_Grip = 90;
 
-int input_BT;
+char input_BT;
 int axis = 0;
 
+// two functions to move servos: 1) up; 2) down
+// 160 is software upper position limit and 20 is lower software position limit for servomechanism  
+void moveServoUp(Servo Srv_chosen, int* Srv_pos){
+  if(*Srv_pos<160){
+    *Srv_pos += 1;
+    Srv_chosen.write(*Srv_pos);
+    delay(50);
+  }
+  else { // softwarte upper limit for servo
+    *Srv_pos = 160;
+    Srv_chosen.write(*Srv_pos);
+    delay(50);
+  }
+}
+
+void moveServoDown(Servo Srv_chosen, int* Srv_pos){
+  if(*Srv_pos>20){
+    *Srv_pos -= 1;
+    Srv_chosen.write(*Srv_pos);
+    delay(50);
+  }
+  else { // software lowwer limit for servo
+    *Srv_pos = 20;
+    Srv_chosen.write(*Srv_pos);
+    delay(50);
+  }
+}
+
 void setup() {
-  ////////////////////Servo////////////////////
+  // Servo
   Srv_BaseLow.attach(Srv_1);
   Srv_BaseAbove.attach(Srv_2);
   Srv_Arm1.attach(Srv_3);
   Srv_Arm2.attach(Srv_4);
   Srv_Grip.attach(Srv_5);
-  ////////////////////BT////////////////////
+  
+  // BT
   Serial.begin(9600);
 
-  ////////////////////Initial posistions////////////////////
+  // Initial posistions
   Srv_BaseLow.write(Srv_Pos_BaseLow);
   Srv_BaseAbove.write(Srv_Pos_BaseAbove);
   Srv_Arm1.write(Srv_Pos_Arm1);
@@ -40,204 +71,76 @@ void setup() {
 }
 
 void loop() {
-
   if (Serial.available() > 0)
   {
     input_BT = Serial.read();
-    if (input_BT == 79) { //baseUp
+    if (input_BT == 'O') { //baseUp
       axis = 1;
     }
-    else if (input_BT == 65) { //baseAboveUp
+    else if (input_BT == 'A') { //baseAboveUp
       axis = 2;
     }
-    else if (input_BT == 67) { //arm1Up
+    else if (input_BT == 'C') { //arm1Up
       axis = 3;
     }
-    else if (input_BT == 68) { //arm2Up
+    else if (input_BT == 'D') { //arm2Up
       axis = 4;
     }
-    else if (input_BT == 69) { //gripUp
+    else if (input_BT == 'E') { //gripUp
       axis = 5;
     }
-    else if (input_BT == 71) { //baseDown
+    else if (input_BT == 'G') { //baseDown
       axis = 6;
     }
-    else if (input_BT == 72) { //baseAboveDown
+    else if (input_BT == 'H') { //baseAboveDown
       axis = 7;
     }
-    else if (input_BT == 73) { //arm1Down
+    else if (input_BT == 'I') { //arm1Down
       axis = 8;
     }
-    else if (input_BT == 74) { //arm2Down
+    else if (input_BT == 'J') { //arm2Down
       axis = 9;
     }
-    else if (input_BT == 75) { //gripDown
+    else if (input_BT == 'K') { //gripDown
       axis = 10;
     }
-    else if (input_BT == 66) {
+    else if (input_BT == 'B') {
       axis = 11;
     }
   }
+  
   switch (axis) {
     case 1:
-      moveServoUp_BaseLow();
+      moveServoUp(Srv_BaseLow, &Srv_Pos_BaseLow);
       break;
     case 2:
-      moveServoUp_BaseAbove();
+      moveServoUp(Srv_BaseAbove, &Srv_Pos_BaseAbove);
       break;
     case 3:
-      moveServoUp_Arm1();
+      moveServoUp(Srv_Arm1, &Srv_Pos_Arm1);
       break;
     case 4:
-      moveServoUp_Arm2();
+      moveServoUp(Srv_Arm2, &Srv_Pos_Arm2);
       break;
     case 5:
-      moveServoUp_Grip();
+      moveServoUp(Srv_Grip, &Srv_Pos_Grip);
       break;
     case 6:
-      moveServoDown_BaseLow();
+      moveServoDown(Srv_BaseLow, &Srv_Pos_BaseLow);
       break;
     case 7:
-      moveServoDown_BaseAbove();
+      moveServoDown(Srv_BaseAbove, &Srv_Pos_BaseAbove);
       break;
     case 8:
-      moveServoDown_Arm1();
+      moveServoDown(Srv_Arm1, &Srv_Pos_Arm1);
       break;
     case 9:
-      moveServoDown_Arm2();
+      moveServoDown(Srv_Arm2, &Srv_Pos_Arm2);
       break;
     case 10:
-      moveServoDown_Grip();
+      moveServoDown(Srv_Grip, &Srv_Pos_Grip);
       break;
     case 11:
-
       break;
-
-  }
-
-}
-
-void moveServoUp_BaseLow() {
-  if (Srv_Pos_BaseLow < 160) {
-    Srv_Pos_BaseLow += 1;
-    Srv_BaseLow.write(Srv_Pos_BaseLow);
-    delay(50);
-  }
-  else {
-    Srv_Pos_BaseLow = 160;
-    Srv_BaseLow.write(Srv_Pos_BaseLow);
-    delay(50);
-  }
-}
-void moveServoUp_BaseAbove() {
-
-  if (Srv_Pos_BaseAbove < 160) {
-    Srv_Pos_BaseAbove += 1;
-    Srv_BaseAbove.write(Srv_Pos_BaseAbove);
-    delay(50);
-  }
-  else {
-    Srv_Pos_BaseAbove = 160;
-    Srv_BaseAbove.write(Srv_Pos_BaseAbove);
-    delay(50);
-  }
-
-
-}
-void moveServoUp_Arm1() {
-  if (Srv_Pos_Arm1 < 160) {
-    Srv_Pos_Arm1 += 1;
-    Srv_Arm1.write(Srv_Pos_Arm1);
-    delay(50);
-  }
-  else {
-    Srv_Pos_Arm1 = 160;
-    Srv_Arm1.write(Srv_Pos_Arm1);
-    delay(50);
-  }
-}
-void moveServoUp_Arm2() {
-  if (Srv_Pos_Arm2 < 160) {
-    Srv_Pos_Arm2 += 1;
-    Srv_Arm2.write(Srv_Pos_Arm2);
-    delay(50);
-  }
-  else {
-    Srv_Pos_Arm2 = 160;
-    Srv_Arm2.write(Srv_Pos_Arm2);
-    delay(50);
-  }
-}
-void moveServoUp_Grip() {
-  if (Srv_Pos_Grip < 160) {
-    Srv_Pos_Grip += 1;
-    Srv_Grip.write(Srv_Pos_Grip);
-    delay(50);
-  }
-  else {
-    Srv_Pos_Grip = 160;
-    Srv_Grip.write(Srv_Pos_Grip);
-    delay(50);
-  }
-}
-
-void moveServoDown_BaseLow() {
-  if (Srv_Pos_BaseLow > 20) {
-    Srv_Pos_BaseLow -= 1;
-    Srv_BaseLow.write(Srv_Pos_BaseLow);
-    delay(50);
-  }
-  else {
-    Srv_Pos_BaseLow = 20;
-    Srv_BaseLow.write(Srv_Pos_BaseLow);
-    delay(50);
-  }
-}
-void moveServoDown_BaseAbove() {
-  if (Srv_Pos_BaseAbove > 20) {
-    Srv_Pos_BaseAbove -= 1;
-    Srv_BaseAbove.write(Srv_Pos_BaseAbove);
-    delay(50);
-  }
-  else {
-    Srv_Pos_BaseAbove = 20;
-    Srv_BaseAbove.write(Srv_Pos_BaseAbove);
-    delay(50);
-  }
-}
-void moveServoDown_Arm1() {
-  if (Srv_Pos_Arm1 > 20) {
-    Srv_Pos_Arm1 -= 1;
-    Srv_Arm1.write(Srv_Pos_Arm1);
-    delay(50);
-  }
-  else {
-    Srv_Pos_Arm1 = 20;
-    Srv_Arm1.write(Srv_Pos_Arm1);
-    delay(50);
-  }
-}
-void moveServoDown_Arm2() {
-  if (Srv_Pos_Arm2 > 20) {
-    Srv_Pos_Arm2 -= 1;
-    Srv_Arm2.write(Srv_Pos_Arm2);
-    delay(50);
-  }
-  else {
-    Srv_Pos_Arm2 = 20;
-    Srv_Arm2.write(Srv_Pos_Arm2);
-    delay(50);
-  }
-}
-void moveServoDown_Grip() {
-  if (Srv_Pos_Grip > 20) {
-    Srv_Pos_Grip -= 1;
-    Srv_Grip.write(Srv_Pos_Grip);
-    delay(50);
-  }
-  else {
-    Srv_Pos_Grip = 20;
-    Srv_Grip.write(Srv_Pos_Grip);
-    delay(50);
   }
 }
